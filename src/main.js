@@ -67,6 +67,15 @@ function setState(kind, text, note) {
 let attempt = 0;
 let received = 0;
 let wakeTimer;
+let silenceTimer;
+let live = false;
+
+function markLive() {
+  if (live) return;
+  live = true;
+  clearTimeout(silenceTimer);
+  setState("on", "Live", "Every trade on Binance for these pairs, as it happens.");
+}
 
 function connect() {
   attempt += 1;
@@ -97,18 +106,31 @@ function connect() {
     if (msg.type === "subscribed") {
       attempt = 0;
       clearTimeout(wakeTimer);
-      setState("on", "Live", "Every trade on Binance for these pairs, as it happens.");
-      (msg.snapshot ?? []).forEach(queue);
+      const snapshot = msg.snapshot ?? [];
+      if (snapshot.length > 0) {
+        markLive();
+        snapshot.forEach(queue);
+      } else {
+        // Connected, but only claim "Live" once a price actually arrives.
+        setState("", "Connected", "Waiting for the first trade…");
+        clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+          if (received === 0) setState("off", "Paused", "Connected, but no trades are arriving. The price feed may be paused.");
+        }, 10000);
+      }
       return;
     }
     if (msg.symbol) {
       received += 1;
+      markLive();
       queue(msg);
     }
   });
 
   socket.addEventListener("close", () => {
     clearTimeout(wakeTimer);
+    clearTimeout(silenceTimer);
+    live = false;
     if (attempt >= 6) return fail();
     setState("", "Reconnecting");
     setTimeout(connect, Math.min(2000 * attempt, 10000));
