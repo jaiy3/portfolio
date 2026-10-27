@@ -77,6 +77,24 @@ function markLive() {
   setState("on", "Live", "Every trade on Binance for these pairs, as it happens.");
 }
 
+// Quiet pairs may not have traded within the API's 30-second cache window.
+// Fill them from the last stored trade so the table is never half empty.
+async function fillFromHistory(have) {
+  await Promise.all(
+    PAIRS.filter((p) => !have.includes(p.symbol)).map(async (p) => {
+      try {
+        const res = await fetch(`${API_ORIGIN}/api/market/history?symbol=${p.symbol}&limit=1`);
+        const item = (await res.json()).data?.items?.[0];
+        if (item && last[p.symbol] === undefined && !pending[p.symbol]) {
+          queue({ symbol: p.symbol, price: item.price, quantity: item.quantity, eventTime: Date.parse(item.eventTime) });
+        }
+      } catch {
+        /* leave the row waiting */
+      }
+    })
+  );
+}
+
 function connect() {
   attempt += 1;
   setState("", "Connecting");
@@ -107,6 +125,7 @@ function connect() {
       attempt = 0;
       clearTimeout(wakeTimer);
       const snapshot = msg.snapshot ?? [];
+      void fillFromHistory(snapshot.map((t) => t.symbol));
       if (snapshot.length > 0) {
         markLive();
         snapshot.forEach(queue);
