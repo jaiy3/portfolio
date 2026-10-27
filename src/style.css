@@ -101,6 +101,9 @@ h1 {
   margin: 0 0 22px;
   max-width: 15ch;
 }
+/* Two-sentence headline on the full-stack page: the second sentence is quieter. */
+h1.h1-long { max-width: 20ch; }
+.h1-second { display: block; color: var(--ink-soft); font-weight: 600; font-size: 0.62em; letter-spacing: -0.02em; line-height: 1.15; margin-top: 14px; max-width: 26ch; }
 .intro { color: var(--ink-soft); max-width: var(--measure); margin: 0 0 30px; font-size: 1.125rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
