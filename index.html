@@ -70,6 +70,29 @@
 
         <article class="project">
           <div class="project-text">
+            <h3>PayLedger</h3>
+            <p class="project-lede">A double-entry payments ledger API. Transfers are idempotent, safe under concurrency and checked by the database itself, and every payment emits a signed webhook.</p>
+            <ul class="points">
+              <li>Accounts are locked in a fixed order inside each transaction, so 30 simultaneous transfers against one balance never overdraw it, and transfers in opposite directions never deadlock. Both cases are tested.</li>
+              <li>Idempotency keys are stored in the same transaction as the ledger writes. A retried request replays the original response and moves no money.</li>
+              <li>PostgreSQL enforces the rules on its own: a deferred trigger rejects unbalanced entries, a CHECK constraint stops negative balances, and postings are append-only.</li>
+              <li>Webhooks use a transactional outbox, HMAC signatures, SKIP LOCKED dispatch and exponential backoff. Reconciliation recomputes every balance from raw postings.</li>
+            </ul>
+            <p class="stack">TypeScript, Express, PostgreSQL with hand-written SQL, React, Vitest, Docker, GitHub Actions</p>
+            <div class="links">
+              <a class="btn" href="https://payledger.onrender.com">Try the sandbox</a>
+              <a class="text-link" href="https://payledger.onrender.com/docs">API docs</a>
+              <a class="text-link" href="https://github.com/jaiy3/payledger">Source code</a>
+            </div>
+          </div>
+          <div class="project-media">
+            <img src="/images/payledger-architecture.svg" width="1200" height="620" alt="PayLedger architecture: an Express API runs each transfer as one PostgreSQL transaction that locks accounts, writes a balanced journal entry, updates balances, queues an outbox event and stores the idempotent response; a dispatcher sends signed webhooks, and reconciliation checks balances against postings." />
+            <img src="/images/payledger-dashboard.webp" width="1600" height="1000" loading="lazy" alt="PayLedger sandbox dashboard: account balances, a transfer form with an idempotency key, and a journal where each entry's debits and credits total zero." />
+          </div>
+        </article>
+
+        <article class="project">
+          <div class="project-text">
             <h3>MarketPulse</h3>
             <p class="project-lede">A real-time crypto market data API. It ingests live Binance trades, fans them out over WebSockets and keeps a queryable price history.</p>
             <ul class="points">
