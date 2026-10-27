@@ -2,12 +2,182 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>portfolio</title>
+    <title>Jaiye Adeboye, Backend Engineer</title>
+    <meta name="description" content="Backend engineer in Lagos building real-time, Web3 and fintech systems with Node.js, TypeScript, PostgreSQL and Redis. Open to remote and Lagos roles." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jaiyeadeboye-portfolio.vercel.app/" />
+    <meta property="og:title" content="Jaiye Adeboye, Backend Engineer" />
+    <meta property="og:description" content="Real-time, Web3 and fintech backends in Node.js and TypeScript. See MarketPulse streaming live." />
+    <meta property="og:image" content="https://jaiyeadeboye-portfolio.vercel.app/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#EEF0EC" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <a class="skip" href="#work">Skip to work</a>
+
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="wordmark" href="/">Jaiye Adeboye</a>
+        <nav aria-label="Main">
+          <a href="#work">Work</a>
+          <a href="#experience">Experience</a>
+          <a href="#contact">Contact</a>
+          <a class="btn btn-small" href="/Jaiye-Adeboye-CV.pdf" download>Download CV</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="status"><span class="status-dot" aria-hidden="true"></span>Open to backend roles, remote or in Lagos</p>
+          <h1 id="hero-title">I build backends that keep up with live money and live data.</h1>
+          <p class="intro">
+            Backend engineer with 3+ years on Web3 and fintech products: two years remote for a US decentralised-storage company, shipping on a Nigerian crypto exchange, and an internship on banking cash-management software. I work in Node.js and TypeScript with PostgreSQL and Redis.
+          </p>
+          <div class="actions">
+            <a class="btn" href="#work">See the work</a>
+            <a class="btn btn-ghost" href="mailto:monjaiye@gmail.com">Email me</a>
+          </div>
+        </div>
+
+        <figure class="live" aria-labelledby="live-caption">
+          <div class="live-head">
+            <span class="live-title">MarketPulse</span>
+            <span class="live-state" id="live-state">Connecting</span>
+          </div>
+          <table class="live-table">
+            <thead>
+              <tr><th scope="col">Pair</th><th scope="col" class="num">Last trade</th><th scope="col" class="num">Since you arrived</th></tr>
+            </thead>
+            <tbody id="live-rows"></tbody>
+          </table>
+          <p class="live-note" id="live-note">Opening a WebSocket to my API…</p>
+          <figcaption id="live-caption">
+            These prices are streaming into this page right now from <a href="https://marketpulse-kozq.onrender.com">MarketPulse</a>, a real-time API I built and run.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="work" class="section container" aria-labelledby="work-title">
+        <h2 id="work-title" class="section-title">Selected work</h2>
+
+        <article class="project">
+          <div class="project-text">
+            <h3>MarketPulse</h3>
+            <p class="project-lede">A real-time crypto market data API. It ingests live Binance trades, fans them out over WebSockets and keeps a queryable price history.</p>
+            <ul class="points">
+              <li>Redis pub/sub sits between ingestion and delivery, so any number of API instances can push the same trade to their WebSocket clients.</li>
+              <li>Database writes go through a BullMQ queue with retries. Job IDs are built from symbol and second, so duplicates and replays never create extra rows.</li>
+              <li>Latest prices expire after 30 seconds: if the stream stalls, clients get no price rather than a stale one.</li>
+              <li>Zod validation on every inbound message, JWT auth, rate limiting, Prometheus metrics, health checks, OpenAPI docs and CI.</li>
+            </ul>
+            <p class="stack">TypeScript, Express, PostgreSQL, Prisma, Redis, BullMQ, WebSockets, Docker, GitHub Actions</p>
+            <div class="links">
+              <a class="btn" href="https://marketpulse-kozq.onrender.com">Open live dashboard</a>
+              <a class="text-link" href="https://marketpulse-kozq.onrender.com/docs">API docs</a>
+              <a class="text-link" href="https://github.com/jaiy3/marketpulse">Source code</a>
+            </div>
+          </div>
+          <div class="project-media">
+            <img src="/images/marketpulse-architecture.svg" width="1240" height="540" alt="MarketPulse architecture: a Binance stream feeds an ingestion worker that writes to a Redis cache, publishes on Redis pub/sub and enqueues to BullMQ; the queue persists to PostgreSQL; a WebSocket hub and REST API serve clients." />
+            <img src="/images/marketpulse-dashboard.webp" width="1600" height="1388" loading="lazy" alt="MarketPulse live dashboard showing BTC, ETH, SOL and BNB prices with sparklines, a live trade feed and stored history." />
+          </div>
+        </article>
+
+        <article class="project">
+          <div class="project-text">
+            <h3>AtlasAI</h3>
+            <p class="project-lede">Ethereum portfolio analytics with an AI assistant that answers from the wallet's real data instead of guessing.</p>
+            <ul class="points">
+              <li>One API call fans out to four Alchemy sources in parallel and returns a single priced portfolio. If NFTs or prices fail, that section degrades instead of the whole response.</li>
+              <li>Balances are read for a curated list of major tokens, which keeps airdropped spam out of the UI and avoids a metadata call per token.</li>
+              <li>The assistant is given the actual holdings plus live prices for any asset the question mentions, and is told never to invent balances.</li>
+              <li>The public demo is cached and request-coalesced, so a traffic spike costs one upstream call. AI and auth routes are rate limited.</li>
+            </ul>
+            <p class="stack">React, TypeScript, Express, PostgreSQL, Prisma, Alchemy, Wagmi, Viem, OpenRouter</p>
+            <div class="links">
+              <a class="btn" href="https://atlas-ai-ashy-six.vercel.app/demo">Try the demo</a>
+              <a class="text-link" href="https://github.com/jaiy3/AtlasAI">Source code</a>
+            </div>
+          </div>
+          <div class="project-media">
+            <img src="/images/atlasai-architecture.svg" width="1000" height="640" loading="lazy" alt="AtlasAI architecture: the React client calls an Express API, which fans out in parallel to Alchemy RPC, token, NFT and price APIs, stores accounts in PostgreSQL and sends the question plus portfolio to an OpenRouter language model." />
+          </div>
+        </article>
+      </section>
+
+      <section id="experience" class="section container" aria-labelledby="exp-title">
+        <h2 id="exp-title" class="section-title">Experience</h2>
+        <ol class="timeline">
+          <li>
+            <div class="when">2024 to 2026</div>
+            <div class="what">
+              <h3>Backend Engineer, Sia Tech</h3>
+              <p class="where">US decentralised-storage company, remote</p>
+              <p>Built and maintained Node.js and TypeScript APIs for the platform's web clients, including authentication and authorisation, third-party integrations and production debugging, in a team spread across US and Nigerian time zones.</p>
+            </div>
+          </li>
+          <li>
+            <div class="when">2023 to 2024</div>
+            <div class="what">
+              <h3>Software Engineer, Parallag Technologies</h3>
+              <p class="where">Lagos</p>
+              <p>Built backend features for Zap Africa, a Nigerian crypto exchange, across C#, JavaScript and Python services with PostgreSQL, and delivered backend work for enterprise clients.</p>
+            </div>
+          </li>
+          <li>
+            <div class="when">2022</div>
+            <div class="what">
+              <h3>Software Engineering Intern, Bluechip Technologies</h3>
+              <p class="where">Lagos</p>
+              <p>Worked in the team behind a bank-grade cash-management platform used by Nigerian financial institutions, on feature delivery, integration testing and data validation.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section container two-col" aria-label="Skills and education">
+        <div>
+          <h2 class="section-title">What I work with</h2>
+          <dl class="skills">
+            <div><dt>Core</dt><dd>TypeScript, Node.js, Express, REST and WebSocket APIs</dd></div>
+            <div><dt>Data</dt><dd>PostgreSQL, Prisma, Redis caching and pub/sub, BullMQ</dd></div>
+            <div><dt>Delivery</dt><dd>Docker, GitHub Actions, Vitest, OpenAPI, Pino, Prometheus</dd></div>
+            <div><dt>Web3 and AI</dt><dd>Ethereum, Alchemy, Viem, Wagmi, OpenAI and OpenRouter APIs</dd></div>
+            <div><dt>Also</dt><dd>React, Python, C#, SQL</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h2 class="section-title">Education</h2>
+          <p class="edu-degree">B.Sc. Computer Science, First Class</p>
+          <p class="edu-detail">Babcock University, CGPA 4.62 out of 5.00</p>
+          <p class="edu-detail">Elected Executive President of the graduating class, and a member of Google Developer Student Club.</p>
+        </div>
+      </section>
+
+      <section id="contact" class="section container contact" aria-labelledby="contact-title">
+        <h2 id="contact-title">Hiring for a backend role?</h2>
+        <p>Email is the quickest way to reach me.</p>
+        <a class="email" href="mailto:monjaiye@gmail.com">monjaiye@gmail.com</a>
+        <ul class="contact-links">
+          <li><a href="https://github.com/jaiy3">GitHub</a></li>
+          <li><a href="/Jaiye-Adeboye-CV.pdf" download>CV (PDF)</a></li>
+          <li><a href="tel:+2347056915165">+234 705 691 5165</a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="container site-footer">
+      <p>Jaiye Adeboye, Lagos. Built with plain HTML, CSS and a WebSocket.</p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
